@@ -34,4 +34,11 @@ attach(meuse)
 # to reverse: detach()
 
 #to display relationships among all the variables use:
-pairs(meuse)  #scatterplot matrices => all the plots of combinations
+pairs(meuse)  #scatterplot matrices => paring all the variable into the dataset
+
+plot(cadmium, zinc, col="blue", pch=19, cex=3) #cex = character exageration: increase the dimension of the dots
+
+#what if we'd like to plot only some subsets of pairs plots
+#creare subset
+pol <- meuse[,3:6]
+pairs(pol)  #plot correlation only for cadmium, copper, lead, zinc => tracer elements for pollution 
