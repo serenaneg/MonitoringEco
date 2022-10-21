@@ -38,4 +38,4 @@ head(covid) #header = country, cases, lat, lon
 summary(covid)
 
 #and now let's do some plot
-ggplot(covid, aes(x = lat, y = lon, size = cases)) + geom_point() #size regulates the size of the points according to their values (bigger values bugger dots)
+ggplot(covid, aes(x = lon, y = lat, size = cases)) + geom_point(col="dodgerblue") #size regulates the size of the points according to their values (bigger values bugger dots)
