@@ -26,3 +26,16 @@ ggplot(d, aes(x = virus, y = death)) + geom_point(col = "blue", size = 5, pch = 
 
 #polygons
 ggplot(d, aes(x = virus, y = death)) + geom_polygon()
+
+#################################################COVID DATA PLOTS######################################################################
+#setting the folder to get the data from that
+setwd("~/Scrivania/Magistrale/monitoring_ecosystem/lab/")
+
+#read the table, with the header
+covid <- read.table("covid_agg.csv", header=TRUE)  
+
+head(covid) #header = country, cases, lat, lon
+summary(covid)
+
+#and now let's do some plot
+ggplot(covid, aes(x = lat, y = lon, size = cases)) + geom_point() #size regulates the size of the points according to their values (bigger values bugger dots)
