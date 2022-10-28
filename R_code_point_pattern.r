@@ -1,5 +1,6 @@
 #Point pattern analysis for population ecology
 library(spatstat)  #spatial statistics
+library(rgdal)
 
 #get dta from the correct directory
 setwd("~/lab/")
@@ -30,11 +31,24 @@ points(covid_planar, pch=19)
 cl <- colorRampPalette(c("cyan", "coral", "chartreuse"))(100)   #define the color we want into a vector
                                                                 #(100) how many level of smoothing we want
 plot(density_map, col = cl)
-points(covid_planar, pch=19, col="darkblue") 
+points(covid_planar, pch=19, col="darkblue", cex=.5) 
 
 #if density decrease => population is dying
 
 #change colors
-cl1 <- colorRampPalette(c("Violet", "darkblue", "blue", "cyan", "green", "yellow", "orange", "red")(100)
+cl1 <- colorRampPalette(c('blue','yellow','orange','red','magenta'))(100)
 plot(density_map, col = cl1)
-points(covid_planar, pch=19) 
+points(covid_planar, pch=19, cex=.5) 
+
+#MODEL THE ABBOUNDANCE of the number of people affected by the virus = abboundance of the virus
+#let's add the coast lines
+coastlines <- readOGR("ne_10m_coastline.shp")
+plot(coastlines, add=T)
+
+###########INTERPOLATION TO FIND THE ABOUNDANCE#################
+marks(covid_planar) <- cases                 #marks = points with a label, to select the value we take the variable "cases" into the dataframe
+cases_map <- Smooth(covid_planar)           #Smooth function to use to do the interrpolation. The argument is the variable that we would like to interpolate
+plot(cases_map)
+#we see now that the cloud with the maximum values is moved to the right, around asia => less point but higher values
+plot(coastlines, add=T)
+points(covid_planar, pch=19, cex=.5, col="green")
