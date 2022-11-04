@@ -41,3 +41,21 @@ attach(biomes_types)
 
 #than we can use the function ordiellipse() = display groups in ordinantin diagrams
 ordiellipse(multivar, type, col=c("black", "red", "green", "blue"), kind="ehull", lwd=3) #type = group difffernt objects according to their type
+
+#this function connect the data inside common ellipse and show their etiquette if label=T
+ordispider(multivar, type, col=c("black", "red", "green", "blue"), label=T, lwd=3)
+
+#how to export the plot in a pdf file and save into the folder
+#we use pdf() function: it is a vectorial format => do not lose image quality
+pdf("multivar.pdf")#quotes because we're going out from R
+#after we write everything we what to save as an image
+plot(multivar)
+ordiellipse(multivar, type, col=c("black","red","green","blue"), kind = "ehull", lwd=3)
+ordispider(multivar, type, col=c("black","red","green","blue"), label = T)
+dev.off() #to close the pdf
+
+#########################EXERCISE#################################
+#export pdf with only multivar plot
+pdf("multivar_only.pdf")
+plot(multivar)
+dev.off()
