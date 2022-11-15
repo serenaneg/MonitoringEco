@@ -28,3 +28,31 @@ plot(image)  #in each band we're measuring reflectance at different wavelenght
 #change color bar =grey scale
 cl <- colorRampPalette(c('black','grey','light grey'))(100)
 plot(image, col=cl)
+
+#plot with different color palette
+#blue
+clb <- colorRampPalette(c('dark blue','blue','light blue'))(100) # 
+plot(image$B1_sre, col=clb)
+
+#green
+clg <- colorRampPalette(c('dark green','green','light green'))(100) # 
+plot(image$B2_sre, col=clg)
+
+#red
+clr <- colorRampPalette(c('dark red','red','pink'))(100) # 
+plot(image$B3_sre, col=clr)
+
+#NIR band
+clnir <- colorRampPalette(c('red','orange','yellow'))(100) # 
+plot(image$B4_sre, col=clnir)
+
+#plot RGB plot
+par(mfrow=c(2,2))  #create ad image 2 rows, 2 col with the following for plot !!BEFORE PDF SAVING
+pdf("remotesensing.pdf")
+plotRGB(image, r=3, g=2, b=1, stretch="Lin") #dark blue
+plotRGB(image, r=4, g=3, b=2, stretch="Lin") #reddish
+plotRGB(image, r=3, g=4, b=2, stretch="Lin") #green
+plotRGB(image, r=3, g=2, b=4, stretch="Lin") #blue
+dev.off() #to close the par function
+
+
