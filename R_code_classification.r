@@ -1,0 +1,5 @@
+#CODE TO CLASSIFY VEGETATION PIXELS = THRESHOLD FOR TREES
+
+#download library
+library(RStoolbox)
+
