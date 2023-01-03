@@ -16,7 +16,7 @@ red <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF")
 rgb <- stack(red, green, blue)
 
 #cut the image to zoom on the region of interest
-#extention of the original image
+#extention of the original image:
 #extent     : 283185, 430005, 4514385, 4732515  (xmin, xmax, ymin, ymax)
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image <- crop(rgb, boundary)
@@ -48,8 +48,18 @@ plotRGB(image_masked, stretch = "lin")
 plot(image_masked) 
 #[1] = nir, [2] = red, [3] = green
 
-#NDVI INDEX = (NIR - RED) / (NIR + RED)
-#using masked image
-ndvi <- (image_masked[1] - image_masked[2]) / (image_masked[1] + image_masked[2])
+#DVI INDEX = NIR - RED
+dvi <- image_masked[[1]] - image_masked[[2]]
 colors = colorRampPalette(c("red3", "white", "darkcyan"))(255)
-plot(ndvi, xlim = c(0, 1), col=colors)
+plot(dvi, col=colors)
+
+#NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
+#using masked image
+ndvi <- (image_masked[[1]] - image_masked[[2]]) / (image_masked[[1]] + image_masked[[2]])
+colors = colorRampPalette(c("red3", "white", "darkcyan"))(255)
+plot(ndvi, col=colors)
+
+par(mfrow=c(1,2))
+plot(dvi, col=colors)
+plot(ndvi, col=colors)
+
