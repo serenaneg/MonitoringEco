@@ -29,22 +29,27 @@ plotRGB(image, stretch = "lin")
 #create the image with nir band (5) as red, red band (4) green and green band (3) as blue 
 green_lw <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF")
 red_lw <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF")
-nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")
+nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")  #mostly land => treshold value to mask the land
 
 rgb_lw <- stack(nir, red_lw, green_lw)
 
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image_lw <- crop(rgb_lw, boundary)
+plot(image_lw)
 plotRGB(image_lw, stretch = "lin")
 
-hist(image_lw)
+#create the mask usig NIR band because is were we have the major contrast between land and sea
+nir_image <- crop(nir, boundary)
+nir_image[nir_image > 20] <- NA
+
+#apply the mask
+image_masked <- mask(image_lw, mask = nir_image)
+plotRGB(image_masked, stretch = "lin")
+plot(image_masked) 
+#[1] = nir, [2] = red, [3] = green
 
 #NDVI INDEX = (NIR - RED) / (NIR + RED)
-#combine red images with boundary
-red_lw <- crop(red_lw, boundary)
-nir <- crop(nir, boundary)
-
-ndvi <- (nir - red_lw) / (nir + red_lw)
-
+#using masked image
+ndvi <- (image_masked[1] - image_masked[2]) / (image_masked[1] + image_masked[2])
 colors = colorRampPalette(c("red3", "white", "darkcyan"))(255)
-plot(ndvi, col=colors)
+plot(ndvi, xlim = c(0, 1), col=colors)
