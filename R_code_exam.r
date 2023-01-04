@@ -4,6 +4,7 @@ library(RStoolbox)
 library(rasterdiv)
 library(ggplot2)
 library(viridis)
+library(RColorBrewer)
 
 #upload the data into R
 setwd("/home/serena/Scrivania/Magistrale/monitoring_ecosystem/alga_bloom/LT05_L1TP_019031_20111005_20200820_02_T1")
@@ -50,16 +51,39 @@ plot(image_masked)
 
 #DVI INDEX = NIR - RED
 dvi <- image_masked[[1]] - image_masked[[2]]
-colors = colorRampPalette(c("red3", "white", "darkcyan"))(255)
-plot(dvi, col=colors)
+pal <- brewer.pal(10, "RdYlBu")
+colors <- colorRampPalette(pal)
+plot(dvi, col = colors(10))
 
 #NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
 #using masked image
 ndvi <- (image_masked[[1]] - image_masked[[2]]) / (image_masked[[1]] + image_masked[[2]])
 colors = colorRampPalette(c("red3", "white", "darkcyan"))(255)
-plot(ndvi, col=colors)
+plot(ndvi, col = colors(10))
 
-par(mfrow=c(1,2))
-plot(dvi, col=colors)
-plot(ndvi, col=colors)
+#SABI = (NIR - RED) / (BLUE + GREEN)
+image2 <- stack(nir, red, green, blue)
+image2 <- crop(image2, boundary)
 
+image2 <- mask(image2, mask = nir_image)
+plot(image2)
+plotRGB(image2, stretch = "lin")
+
+sabi <- (image2[[1]] - image2[[2]]) / (image2[[4]] + image2[[3]])
+plot(sabi, col = colors(10))
+
+#Floating Algae Index FAI 
+swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B6.TIF")
+image3 <- stack(swir, nir, red_lw)
+image3 <- crop(image3, boundary)
+image3 <- mask(image3, mask = nir_image)
+
+#FAI = NIR - RED - (SWIR - RED)*(l_NIR - l_RED) / (l_SWIR - l_RED)
+fai <- image3[[2]] - image3[[3]] - (image3[[1]] - image3[[2]])*((865 - 655) / (1610 - 655))
+plot(fai, col = colors(10))
+
+par(mfrow=c(1,4))
+plot(dvi, col=colors(10), main = "DVI")
+plot(ndvi, col=colors(10), main = "NDVI")
+plot(sabi, col=colors(10), main = "SABI")
+plot(fai, col = colors(10), main = "FAI")
