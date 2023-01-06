@@ -17,40 +17,50 @@ red_lw <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF")
 nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")  #mostly land => treshold value to mask the land
 swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B6.TIF")
 
-rgb <- stack(red, green, blue)
+image <- stack(swir, nir, red_lw, red, green, blue)
 
 #cut the image to zoom on the region of interest
 #extention of the original image:
 #extent     : 283185, 430005, 4514385, 4732515  (xmin, xmax, ymin, ymax)
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
-image <- crop(rgb, boundary)
-plotRGB(image, stretch = "lin")
+image <- crop(image, boundary)
 
+#plot true color image and save
+pdf("rgbTrue.pdf")
+plotRGB(image, r = 4, g = 5, b = 6, stretch = "lin")
+dev.off
 
 #ok with linear stretching because it has a strong contrast very useful to visualise algae
 
 #infrared image
 #create the image with nir band (5) as red, red band (4) green and green band (3) as blue 
-green_lw <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF")
-red_lw <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF")
-nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")  #mostly land => treshold value to mask the land
-
-rgb_lw <- stack(nir, red_lw, green_lw)
-
+rgb_lw <- stack(nir, red_lw, red)
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image_lw <- crop(rgb_lw, boundary)
-plot(image_lw)
-plotRGB(image_lw, stretch = "lin")
 
+#plot
+pdf("rgbFalse.pdf")
+plot(image_lw, xaxt='n', yaxt='n', main = c("NIR - Band 5", "Red lw - Band 4", "red - Band 4" ))
+dev.off()
+
+#looking at the nir image band, id the one with grater contrast between land and sea pixels => used to create the mask
 #create the mask usig NIR band because is were we have the major contrast between land and sea
 nir_image <- crop(nir, boundary)
 nir_image[nir_image > 20] <- NA
 
 #apply the mask
-image_masked <- mask(image_lw, mask = nir_image)
-plotRGB(image_masked, stretch = "lin")
-plot(image_masked) 
-#[1] = nir, [2] = red, [3] = green
+image_masked <- mask(image, mask = nir_image)
+#plot images
+pdf("masked.pdf")
+par(mfrow=c(1,2))
+#TRUE COLOR
+plotRGB(image_masked, r = 4, g = 5, b = 6, stretch = "lin")
+legend("top", legend = NA, title = expression(bold("RGB True Color")), bty = "n", cex = 1.3)
+
+#FALSE COLOR
+plotRGB(image_masked, r = 2, g = 3, b = 4, stretch = "lin") 
+legend("top", legend = NA, title = expression(bold("RGB False Color")), bty = "n", cex = 1.3)
+dev.off()
 
 #DVI INDEX = NIR - RED
 dvi <- image_masked[[1]] - image_masked[[2]]
