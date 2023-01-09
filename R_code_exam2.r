@@ -3,7 +3,6 @@ library(rgdal)
 library(RStoolbox)
 library(rasterdiv)
 library(ggplot2)
-library(viridis)
 library(RColorBrewer)
 
 #upload the data into R
@@ -26,7 +25,8 @@ image <- crop(file, boundary)
 
 #plot true color image and save
 pdf("rgbTrue.pdf")
-plotRGB(image, r = 3, g = 2, b = 1, stretch = "lin")
+par(mfrow=c(2,2))
+plotRGB(image, r = 3, g = 2, b = 1, stretch = "lin", main = "Linear stretching")
 dev.off()
 
 #ok with linear stretching because it has a strong contrast very useful to visualise algae
@@ -66,11 +66,11 @@ pdf("layers.pdf")
 plot(image_masked, xaxt='n', yaxt='n', main = c("BLUE - Band 1", "GREEN - Band 2", "RED - Band 3", "NIR - Band 4", "SWIR - Band 5"))
 dev.off()
 
+#specify color scheme
+colors <- colorRampPalette(c('darkblue', 'yellow', 'red', 'black'))(100)
+
 #DVI INDEX = NIR - RED
 dvi <- image_masked[[4]] - image_masked[[3]]
-colors = colorRampPalette(c("darkcyan", "white", "red3"))(255)
-#pal <- brewer.pal(200, "RdYlBu")
-#colors <- colorRampPalette(pal)
 plot(dvi, col = colors)
 
 #NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
@@ -95,6 +95,16 @@ plot(ndvi, col=colors, main = "NDVI")
 plot(sabi, col=colors, main = "SABI")
 plot(fai, col = colors, main = "FAI")
 dev.off()
+
+# Automatic spectral indices by the spectralIndices function
+si <- spectralIndices(image_masked, green = 2, red = 3, nir = 4)
+plot(si, col = colors)
+
+#ggplot plots
+ggplot() +
+geom_raster(dvi, mapping = aes(x=x, y=y, fill = dvi)) +
+ggtitle("DVI index") +
+scale_fill_viridis(option="inferno")
 
 par(mfrow=c(2,2))
 hist(dvi, xlim = c(-25, 0), main = "Frequency DVI < 0")
