@@ -10,93 +10,95 @@ library(RColorBrewer)
 setwd("/home/serena/Scrivania/Magistrale/monitoring_ecosystem/alga_bloom/LT05_L1TP_019031_20111005_20200820_02_T1")
 
 #load layers that create the image
-blue <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B1.TIF")#09/10/2011
-green <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B2.TIF")
-red <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF")
-red_lw <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF")
-nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")  #mostly land => treshold value to mask the land
-swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B6.TIF")
+blue <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B1.TIF") #0.45-0.52
+green <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B2.TIF") #0.52-0.60
+red <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF") #0.63-0.69
+nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF") #0.76-0.90
+swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")  #1.55-1.75
 
-image <- stack(swir, nir, red_lw, red, green, blue)
+file <- stack(blue, green, red, nir, swir)
 
 #cut the image to zoom on the region of interest
 #extention of the original image:
 #extent     : 283185, 430005, 4514385, 4732515  (xmin, xmax, ymin, ymax)
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
-image <- crop(image, boundary)
+image <- crop(file, boundary)
 
 #plot true color image and save
 pdf("rgbTrue.pdf")
-plotRGB(image, r = 4, g = 5, b = 6, stretch = "lin")
-dev.off
+plotRGB(image, r = 3, g = 2, b = 1, stretch = "lin")
+dev.off()
 
 #ok with linear stretching because it has a strong contrast very useful to visualise algae
 
 #infrared image
 #create the image with nir band (5) as red, red band (4) green and green band (3) as blue 
-rgb_lw <- stack(nir, red_lw, red)
+rgb_lw <- stack(swir, nir, red)
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image_lw <- crop(rgb_lw, boundary)
 
-#plot
+#plot layers red bands
 pdf("rgbFalse.pdf")
-plot(image_lw, xaxt='n', yaxt='n', main = c("NIR - Band 5", "Red lw - Band 4", "red - Band 4" ))
+plot(image_lw, xaxt='n', yaxt='n', main = c("SWIR - Band 5", "NIR - Band 4", "Red - Band 3" ))
 dev.off()
 
-#looking at the nir image band, id the one with grater contrast between land and sea pixels => used to create the mask
+#looking at the swir image band, id the one with grater contrast between land and sea pixels => used to create the mask
 #create the mask usig NIR band because is were we have the major contrast between land and sea
-nir_image <- crop(nir, boundary)
-nir_image[nir_image > 20] <- NA
+swir_image <- crop(swir, boundary)
+swir_image[swir_image > 20] <- NA
 
 #apply the mask
-image_masked <- mask(image, mask = nir_image)
+image_masked <- mask(image, mask = swir_image)
 #plot images
 pdf("masked.pdf")
 par(mfrow=c(1,2))
 #TRUE COLOR
-plotRGB(image_masked, r = 4, g = 5, b = 6, stretch = "lin")
+plotRGB(image_masked, r = 3, g = 2, b = 1, stretch = "lin")
 legend("top", legend = NA, title = expression(bold("RGB True Color")), bty = "n", cex = 1.3)
 
 #FALSE COLOR
-plotRGB(image_masked, r = 2, g = 3, b = 4, stretch = "lin") 
+plotRGB(image_masked, r = 4, g = 3, b = 2, stretch = "lin") 
 legend("top", legend = NA, title = expression(bold("RGB False Color")), bty = "n", cex = 1.3)
 dev.off()
 
+#layers
+pdf("layers.pdf")
+plot(image_masked, xaxt='n', yaxt='n', main = c("BLUE - Band 1", "GREEN - Band 2", "RED - Band 3", "NIR - Band 4", "SWIR - Band 5"))
+dev.off()
+
 #DVI INDEX = NIR - RED
-dvi <- image_masked[[1]] - image_masked[[2]]
-pal <- brewer.pal(10, "RdYlBu")
-colors <- colorRampPalette(pal)
-plot(dvi, col = colors(10))
+dvi <- image_masked[[4]] - image_masked[[3]]
+colors = colorRampPalette(c("darkcyan", "white", "red3"))(255)
+#pal <- brewer.pal(200, "RdYlBu")
+#colors <- colorRampPalette(pal)
+plot(dvi, col = colors)
 
 #NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
 #using masked image
-ndvi <- (image_masked[[1]] - image_masked[[2]]) / (image_masked[[1]] + image_masked[[2]])
-colors = colorRampPalette(c("red3", "white", "darkcyan"))(255)
-plot(ndvi, col = colors(10))
+ndvi <- ((image_masked[[4]] - image_masked[[3]]) / (image_masked[[4]] + image_masked[[3]]))
+plot(ndvi, col = colors)
 
 #SABI = (NIR - RED) / (BLUE + GREEN)
-image2 <- stack(nir, red, green, blue)
-image2 <- crop(image2, boundary)
+sabi <- (image_masked[[4]] - image_masked[[3]]) / (image_masked[[1]] + image_masked[[2]])
+plot(sabi, col = colors)
 
-image2 <- mask(image2, mask = nir_image)
-plot(image2)
-plotRGB(image2, stretch = "lin")
-
-sabi <- (image2[[1]] - image2[[2]]) / (image2[[4]] + image2[[3]])
-plot(sabi, col = colors(10))
-
-#Floating Algae Index FAI 
-swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B6.TIF")
-image3 <- stack(swir, nir, red_lw)
-image3 <- crop(image3, boundary)
-image3 <- mask(image3, mask = nir_image)
-
+#Floating Algae Index FAI
 #FAI = NIR - RED - (SWIR - RED)*(l_NIR - l_RED) / (l_SWIR - l_RED)
-fai <- image3[[2]] - image3[[3]] - (image3[[1]] - image3[[2]])*((865 - 655) / (1610 - 655))
-plot(fai, col = colors(10))
+fai <- image_masked[[4]] - image_masked[[3]] - (image_masked[[5]] - image_masked[[3]])*((0.83 - 0.66) / (1.65 - 0.66))
+#waveleght of the band calculated as the mean value of the range given
+plot(fai, col = colors)
 
-par(mfrow=c(1,4))
-plot(dvi, col=colors(10), main = "DVI")
-plot(ndvi, col=colors(10), main = "NDVI")
-plot(sabi, col=colors(10), main = "SABI")
-plot(fai, col = colors(10), main = "FAI")
+pdf("confronto.pdf")
+par(mfrow=c(2,2))
+plot(dvi, col=colors, main = "DVI")
+plot(ndvi, col=colors, main = "NDVI")
+plot(sabi, col=colors, main = "SABI")
+plot(fai, col = colors, main = "FAI")
+dev.off()
+
+par(mfrow=c(2,2))
+hist(dvi, xlim = c(-25, 0), main = "Frequency DVI < 0")
+hist(ndvi, xlim = c(-45, 0), main = "Frequency NDVI < 0")
+hist(sabi, xlim = c(-0.4, 0), main = "Frequency SABI < 0")
+hist(fai, xlim = c(-20, 0), main = "Frequency FAI < 0")
+
