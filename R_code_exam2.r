@@ -10,11 +10,11 @@ library(RColorBrewer)
 setwd("/home/serena/Scrivania/Magistrale/monitoring_ecosystem/alga_bloom/LT05_L1TP_019031_20111005_20200820_02_T1")
 
 #load layers that create the image
-blue <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B1.TIF") #0.45-0.52
-green <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B2.TIF") #0.52-0.60
-red <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF") #0.63-0.69
-nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF") #0.76-0.90
-swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF")  #1.55-1.75
+blue <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B1.TIF") #0.45-0.52 nm
+green <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B2.TIF") #0.52-0.60 nm
+red <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B3.TIF") #0.63-0.69 nm
+nir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B4.TIF") #0.76-0.90 nm
+swir <- raster("LT05_L1TP_019031_20111005_20200820_02_T1_B5.TIF") #1.55-1.75 nm
 
 file <- stack(blue, green, red, nir, swir)
 
