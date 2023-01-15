@@ -89,26 +89,18 @@ fai <- image_masked[[4]] - image_masked[[3]] - (image_masked[[5]] - image_masked
 plot(fai, col = colors)
 
 pdf("confronto.pdf")
-par(mfrow=c(2,2))
+par(mfrow=c(2,2), mar= c(3.5, 3.5, 3.5, 7))
 plot(dvi, col=colors, main = "DVI")
 plot(ndvi, col=colors, main = "NDVI")
 plot(sabi, col=colors, main = "SABI")
 plot(fai, col = colors, main = "FAI")
 dev.off()
 
-# Automatic spectral indices by the spectralIndices function
-si <- spectralIndices(image_masked, green = 2, red = 3, nir = 4)
-plot(si, col = colors)
-
-#ggplot plots
-ggplot() +
-geom_raster(dvi, mapping = aes(x=x, y=y, fill = dvi)) +
-ggtitle("DVI index") +
-scale_fill_viridis(option="inferno")
-
-par(mfrow=c(2,2))
-hist(dvi, xlim = c(-25, 0), main = "Frequency DVI < 0")
-hist(ndvi, xlim = c(-45, 0), main = "Frequency NDVI < 0")
-hist(sabi, xlim = c(-0.4, 0), main = "Frequency SABI < 0")
-hist(fai, xlim = c(-20, 0), main = "Frequency FAI < 0")
-
+#histogram
+pdf("hist.pdf")
+par(mfrow=c(2,2)m mar= c(3.5, 3.5, 3.5, 3.5))
+hist(dvi, xlab = "Value", main = "DVI")
+hist(ndvi, xlab = "Value", main = "NDVI")
+hist(sabi, xlab = "Value", main = "SABI")
+hist(fai, xlab = "Value", main = "FAI")
+dev.off()
