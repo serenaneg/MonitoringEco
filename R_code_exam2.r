@@ -39,13 +39,17 @@ image_lw <- crop(rgb_lw, boundary)
 #plot layers red bands
 pdf("rgbFalse.pdf", width = 7, height = 6)
 par(pty = "m", mar = c(2, 4, 4, 4))
-plot(image_lw, xaxt='n', yaxt='n', main = c( "Red - Band 3", "NIR - Band 4", "SWIR - Band 5"))
+plot(image_lw, xaxt = 'n', yaxt = 'n', main = c( "Red - Band 3", "NIR - Band 4", "SWIR - Band 5"))
 dev.off()
 
 #looking at the swir image band, id the one with grater contrast between land and sea pixels => used to create the mask
 #create the mask usig NIR band because is were we have the major contrast between land and sea
 swir_image <- crop(swir, boundary)
-swir_image[swir_image > 20] <- NA
+swir_image[swir_image > 1] <- NA
+
+pdf("mask.pdf")
+plot(swir_image, xaxt = 'n', yaxt = 'n', col = 'darkcyan', legend = F, axes = F)
+dev.off()
 
 #apply the mask
 image_masked <- mask(image, mask = swir_image)
@@ -53,13 +57,13 @@ image_masked <- mask(image, mask = swir_image)
 pdf("masked_rgb.pdf")
 #TRUE COLOR
 plotRGB(image_masked, r = 3, g = 2, b = 1, stretch = "lin")
-legend("top", legend = NA, title = expression(bold("RGB True Color")), bty = "n", cex = 1.3)
+legend("topleft", legend = NA, title = expression(bold("RGB True Color")), bty = "n", cex = 1.3)
 dev.off()
 
 #FALSE COLOR
 pdf("masked_false.pdf")
 plotRGB(image_masked, r = 4, g = 3, b = 2, stretch = "lin") 
-legend("top", legend = NA, title = expression(bold("RGB False Color")), bty = "n", cex = 1.3)
+legend("topleft", legend = NA, title = expression(bold("RGB False Color")), bty = "n", cex = 1.3)
 dev.off()
 
 #layers
