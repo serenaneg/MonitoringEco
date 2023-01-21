@@ -45,7 +45,7 @@ dev.off()
 #looking at the swir image band, id the one with grater contrast between land and sea pixels => used to create the mask
 #create the mask usig NIR band because is were we have the major contrast between land and sea
 swir_image <- crop(swir, boundary)
-swir_image[swir_image > 1] <- NA
+swir_image[swir_image > 11] <- NA
 
 pdf("mask.pdf")
 plot(swir_image, xaxt = 'n', yaxt = 'n', col = 'darkcyan', legend = F, axes = F)
@@ -57,13 +57,13 @@ image_masked <- mask(image, mask = swir_image)
 pdf("masked_rgb.pdf")
 #TRUE COLOR
 plotRGB(image_masked, r = 3, g = 2, b = 1, stretch = "lin")
-legend("topleft", legend = NA, title = expression(bold("RGB True Color")), bty = "n", cex = 1.3)
+legend("top", legend = NA, title = expression(bold("RGB True Color")), bty = "n", cex = 1.3)
 dev.off()
 
 #FALSE COLOR
 pdf("masked_false.pdf")
 plotRGB(image_masked, r = 4, g = 3, b = 2, stretch = "lin") 
-legend("topleft", legend = NA, title = expression(bold("RGB False Color")), bty = "n", cex = 1.3)
+legend("top", legend = NA, title = expression(bold("RGB False Color")), bty = "n", cex = 1.3)
 dev.off()
 
 #layers
@@ -71,27 +71,24 @@ pdf("layers.pdf")
 plot(image_masked, xaxt='n', yaxt='n', main = c("BLUE - Band 1", "GREEN - Band 2", "RED - Band 3", "NIR - Band 4", "SWIR - Band 5"))
 dev.off()
 
+#################################### SPACTAL INDEXES #######################################################
 #specify color scheme
 colors <- colorRampPalette(c('darkblue', 'yellow', 'red', 'black'))(100)
 
 #DVI INDEX = NIR - RED
 dvi <- image_masked[[4]] - image_masked[[3]]
-plot(dvi, col = colors)
+#??single plots??
 
 #NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
-#using masked image
 ndvi <- ((image_masked[[4]] - image_masked[[3]]) / (image_masked[[4]] + image_masked[[3]]))
-plot(ndvi, col = colors)
 
 #SABI = (NIR - RED) / (BLUE + GREEN)
 sabi <- (image_masked[[4]] - image_masked[[3]]) / (image_masked[[1]] + image_masked[[2]])
-plot(sabi, col = colors)
 
 #Floating Algae Index FAI
 #FAI = NIR - RED - (SWIR - RED)*(l_NIR - l_RED) / (l_SWIR - l_RED)
 fai <- image_masked[[4]] - image_masked[[3]] - (image_masked[[5]] - image_masked[[3]])*((0.83 - 0.66) / (1.65 - 0.66))
 #waveleght of the band calculated as the mean value of the range given
-plot(fai, col = colors)
 
 pdf("confronto.pdf")
 par(mfrow=c(2,2), mar= c(3.5, 3.5, 3.5, 7))
