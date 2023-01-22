@@ -37,8 +37,8 @@ boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image_lw <- crop(rgb_lw, boundary)
 
 #plot layers red bands
-pdf("rgbFalse.pdf", width = 7, height = 6)
-par(pty = "m", mar = c(2, 4, 4, 4))
+pdf("rgbFalse.pdf")
+par(pty = "m", mar = c(3.5, 3.5, 3.5, 3.5))
 plot(image_lw, xaxt = 'n', yaxt = 'n', main = c( "Red - Band 3", "NIR - Band 4", "SWIR - Band 5"))
 dev.off()
 
@@ -77,30 +77,46 @@ colors <- colorRampPalette(c('darkblue', 'yellow', 'red', 'black'))(100)
 
 #DVI INDEX = NIR - RED
 dvi <- image_masked[[4]] - image_masked[[3]]
-#??single plots??
+
+pdf("dvi.pdf")
+plot(dvi, main = "DVI", col = colors)
+dev.off()
 
 #NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
 ndvi <- ((image_masked[[4]] - image_masked[[3]]) / (image_masked[[4]] + image_masked[[3]]))
 
+pdf("ndvi.pdf")
+plot(ndvi, main = "NDVI", col = colors)
+dev.off()
+
 #SABI = (NIR - RED) / (BLUE + GREEN)
 sabi <- (image_masked[[4]] - image_masked[[3]]) / (image_masked[[1]] + image_masked[[2]])
+
+pdf("sabi.pdf")
+plot(sabi, main = "SABI", col = colors)
+dev.off()
 
 #Floating Algae Index FAI
 #FAI = NIR - RED - (SWIR - RED)*(l_NIR - l_RED) / (l_SWIR - l_RED)
 fai <- image_masked[[4]] - image_masked[[3]] - (image_masked[[5]] - image_masked[[3]])*((0.83 - 0.66) / (1.65 - 0.66))
 #waveleght of the band calculated as the mean value of the range given
 
+pdf("fai.pdf")
+plot(fai, main = "FAI", col = colors)
+dev.off()
+
+#comparison amog indexes
 pdf("confronto.pdf")
-par(mfrow=c(2,2), mar= c(3.5, 3.5, 3.5, 7))
-plot(dvi, col=colors, main = "DVI")
-plot(ndvi, col=colors, main = "NDVI")
-plot(sabi, col=colors, main = "SABI")
+par(mfrow=c(2,2), ma r= c(3.5, 3.5, 3.5, 7))
+plot(dvi, col = colors, main = "DVI")
+plot(ndvi, col = colors, main = "NDVI")
+plot(sabi, col = colors, main = "SABI")
 plot(fai, col = colors, main = "FAI")
 dev.off()
 
 #histogram
 pdf("hist.pdf")
-par(mfrow=c(2,2)m mar= c(3.5, 3.5, 3.5, 3.5))
+par(mfrow=c(2,2), mar = c(3.5, 3.5, 3.5, 3.5))
 hist(dvi, xlab = "Value", main = "DVI")
 hist(ndvi, xlab = "Value", main = "NDVI")
 hist(sabi, xlab = "Value", main = "SABI")
