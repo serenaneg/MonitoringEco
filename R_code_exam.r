@@ -1,8 +1,7 @@
 #load useful library
 library(rgdal)
 library(RStoolbox)
-library(rasterdiv)
-library(ggplot2)
+library(raster)
 library(RColorBrewer)
 
 #upload the data into R
@@ -107,7 +106,7 @@ dev.off()
 
 #comparison amog indexes
 pdf("confronto.pdf")
-par(mfrow=c(2,2), ma r= c(3.5, 3.5, 3.5, 7))
+par(mfrow=c(2,2), mar = c(3.5, 3.5, 3.5, 7))
 plot(dvi, col = colors, main = "DVI")
 plot(ndvi, col = colors, main = "NDVI")
 plot(sabi, col = colors, main = "SABI")
@@ -116,7 +115,7 @@ dev.off()
 
 #histogram
 pdf("hist.pdf")
-par(mfrow=c(2,2), mar = c(3.5, 3.5, 3.5, 3.5))
+par(mfrow=c(2,2))
 hist(dvi, xlab = "Value", main = "DVI")
 hist(ndvi, xlab = "Value", main = "NDVI")
 hist(sabi, xlab = "Value", main = "SABI")
