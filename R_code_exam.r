@@ -70,7 +70,7 @@ pdf("layers.pdf")
 plot(image_masked, xaxt='n', yaxt='n', main = c("BLUE - Band 1", "GREEN - Band 2", "RED - Band 3", "NIR - Band 4", "SWIR - Band 5"))
 dev.off()
 
-#################################### SPACTAL INDEXES #######################################################
+#################################### SPECTRAL INDECES #######################################################
 #specify color scheme
 colors <- colorRampPalette(c('darkblue', 'yellow', 'red', 'black'))(100)
 
