@@ -3,6 +3,9 @@ library(rgdal)
 library(RStoolbox)
 library(raster)
 library(RColorBrewer)
+library(ggplot2)
+library(reshape2) #to create the data frame for ggplot graphs
+library(patchwork)
 
 #upload the data into R
 setwd("/home/serena/Scrivania/Magistrale/monitoring_ecosystem/alga_bloom/LT05_L1TP_019031_20111005_20200820_02_T1")
@@ -120,4 +123,39 @@ hist(dvi, xlab = "Value", main = "DVI")
 hist(ndvi, xlab = "Value", main = "NDVI")
 hist(sabi, xlab = "Value", main = "SABI")
 hist(fai, xlab = "Value", main = "FAI")
+dev.off()
+#can be better => use ggplot
+
+######################### GGPLOT GRAPHS ############################################
+#create a data frame with the indices (raster)
+#stack of the indices
+index <- stack(dvi, ndvi, sabi, fai)
+dat <- as.data.frame(index)
+
+df <- melt(dat)  #melt function to reshape the data frame
+
+p1 <- ggplot(dat, aes(x = layer.1)) + 
+     geom_histogram(color = "black", fill = "chartreuse3", alpha = .4, lwd = 0.5) + labs(title = "DVI distribution", x = "Value", y = "Frequency")
+p2 <- ggplot(dat, aes(x = layer.2)) + 
+     geom_histogram(color = "black", fill = "orange", alpha = .4, lwd = 0.5) + labs(title = "NDVI distribution", x = "Value", y = "Frequency")
+p3 <- ggplot(dat, aes(x = layer.3)) + 
+     geom_histogram(color = "black", fill = "blue", alpha = .4, lwd = 0.5) + labs(title = "SABI distribution", x = "Value", y = "Frequency")
+p4 <- ggplot(dat, aes(x = layer.4)) + 
+     geom_histogram(color = "black", fill = "coral", alpha = .4, lwd = 0.5) + labs(title = "FAI distribution", x = "Value", y = "Frequency")
+
+pdf("hist_gg.pdf", 11, 8)
+(p1 + p2) / (p3 + p4)
+dev.off()
+
+d1 <- ggplot(dat, aes(x = layer.1)) + 
+     geom_density(color = "chartreuse3", fill = "chartreuse3", alpha = .25) + labs(title = "DVI density", x = "Value", y = "Density")
+d2 <- ggplot(dat, aes(x = layer.2)) + 
+     geom_density(color = "orange",  fill = "orange", alpha = .25) + labs(title = "NDVI density", x = "Value", y = "Density")
+d3 <- ggplot(dat, aes(x = layer.3)) + 
+     geom_density(color = "blue", fill = "blue", alpha = .25) + labs(title = "SABI density", x = "Value", y = "Density")
+d4 <- ggplot(dat, aes(x = layer.4)) + 
+     geom_density(color = "coral", fill = "coral", alpha = .25) + labs(title = "FAI density", x = "Value", y = "Density")
+
+pdf("density.pdf", 11, 8)
+(d1 + d2) / (d3 + d4)
 dev.off()
