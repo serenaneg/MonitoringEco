@@ -21,7 +21,7 @@ file <- stack(blue, green, red, nir, swir)
 
 #cut the image to zoom on the region of interest
 #extention of the original image: 283185, 430005, 4514385, 4732515  
-boundary <- raster( xmn = 369000, xmx = 430000 , ymn = 4609900, ymx = 4680000)
+boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image <- crop(file, boundary)
 
 #plot true color image and save
@@ -35,7 +35,7 @@ dev.off()
 #infrared image
 #create the image with nir band (5) as red, red band (4) green and green band (3) as blue 
 rgb_lw <- stack(red, nir, swir)
-boundary <- raster( xmn = 369000, xmx = 430000 , ymn = 4609900, ymx = 4680000)
+boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
 image_lw <- crop(rgb_lw, boundary)
 
 #plot layers red bands
@@ -132,8 +132,10 @@ dev.off()
 index <- stack(dvi, ndvi, sabi, fai)
 dat <- as.data.frame(index)
 
-df <- melt(dat)  #melt function to reshape the data frame
+#remove NAN value
+dat <- na.omit(na)
 
+#Histograms
 p1 <- ggplot(dat, aes(x = layer.1)) + 
      geom_histogram(color = "black", fill = "chartreuse3", alpha = .4, lwd = 0.5) + labs(title = "DVI distribution", x = "Value", y = "Frequency")
 p2 <- ggplot(dat, aes(x = layer.2)) + 
@@ -147,6 +149,7 @@ pdf("hist_gg.pdf", 11, 8)
 (p1 + p2) / (p3 + p4)
 dev.off()
 
+#density distributions
 d1 <- ggplot(dat, aes(x = layer.1)) + 
      geom_density(color = "chartreuse3", fill = "chartreuse3", alpha = .25) + labs(title = "DVI density", x = "Value", y = "Density")
 d2 <- ggplot(dat, aes(x = layer.2)) + 
@@ -159,3 +162,11 @@ d4 <- ggplot(dat, aes(x = layer.4)) +
 pdf("density.pdf", 11, 8)
 (d1 + d2) / (d3 + d4)
 dev.off()
+
+#overlay density on histrograms
+ggplot(dat, aes(x = layer.1)) +
+  geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
+  geom_density(lwd = 1, fill = "chartreuse3", col = "chartreuse3", alpha = .25) +
+  labs(title = "DVI distribution", x = "Value", y = "Density")
+  
+  
