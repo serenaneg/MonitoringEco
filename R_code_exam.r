@@ -22,6 +22,8 @@ file <- stack(blue, green, red, nir, swir)
 #cut the image to zoom on the region of interest
 #extention of the original image: 283185, 430005, 4514385, 4732515  
 boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
+
+#use crop() to create the geographica subset of the original image (raster object)
 image <- crop(file, boundary)
 
 #plot true color image and save
@@ -30,7 +32,6 @@ par(mfrow=c(2,2))
 plotRGB(image, r = 3, g = 2, b = 1, stretch = "lin")
 dev.off()
 
-#ok with linear stretching because it has a strong contrast very useful to visualise algae
 
 #infrared image
 #create the image with nir band (5) as red, red band (4) green and green band (3) as blue 
@@ -53,8 +54,9 @@ pdf("mask.pdf")
 plot(swir_image, xaxt = 'n', yaxt = 'n', col = 'darkcyan', legend = F, axes = F)
 dev.off()
 
-#apply the mask
+#apply the mask using mask() => return same values as image, except for the cells that are NA in the mask
 image_masked <- mask(image, mask = swir_image)
+
 #plot images
 pdf("masked_rgb.pdf")
 #TRUE COLOR
@@ -77,20 +79,23 @@ dev.off()
 #specify color scheme
 colors <- colorRampPalette(c('darkblue', 'yellow', 'red', 'black'))(100)
 
-#DVI INDEX = NIR - RED
+#Difference Vegetation Index
+#DVI = NIR - RED
 dvi <- image_masked[[4]] - image_masked[[3]]
 
 pdf("dvi.pdf")
 plot(dvi, main = "DVI", col = colors)
 dev.off()
 
-#NDVI INDEX = (NIR - RED) / (NIR + RED) -> normalized
+#Normalized DVI
+#NDVI = (NIR - RED) / (NIR + RED) -> normalized
 ndvi <- ((image_masked[[4]] - image_masked[[3]]) / (image_masked[[4]] + image_masked[[3]]))
 
 pdf("ndvi.pdf")
 plot(ndvi, main = "NDVI", col = colors)
 dev.off()
 
+#Surface Algae Blooming Index
 #SABI = (NIR - RED) / (BLUE + GREEN)
 sabi <- (image_masked[[4]] - image_masked[[3]]) / (image_masked[[1]] + image_masked[[2]])
 
@@ -98,10 +103,10 @@ pdf("sabi.pdf")
 plot(sabi, main = "SABI", col = colors)
 dev.off()
 
-#Floating Algae Index FAI
+#Floating Algae Index
 #FAI = NIR - RED - (SWIR - RED)*(l_NIR - l_RED) / (l_SWIR - l_RED)
 fai <- image_masked[[4]] - image_masked[[3]] - (image_masked[[5]] - image_masked[[3]])*((0.83 - 0.66) / (1.65 - 0.66))
-#waveleght of the band calculated as the mean value of the range given
+#waveleght associated to the band calculated as the mean value of the range of values of the Landasat Bands
 
 pdf("fai.pdf")
 plot(fai, main = "FAI", col = colors)
@@ -126,13 +131,13 @@ hist(fai, xlab = "Value", main = "FAI")
 dev.off()
 #can be better => use ggplot
 
-######################### GGPLOT GRAPHS ############################################
+############################################# GGPLOT GRAPHS ##################################################################
 #create a data frame with the indices (raster)
 #stack of the indices
 index <- stack(dvi, ndvi, sabi, fai)
 dat <- as.data.frame(index)
 
-#remove NAN value
+#remove NAN values
 dat <- na.omit(na)
 
 #Histograms
@@ -168,5 +173,7 @@ ggplot(dat, aes(x = layer.1)) +
   geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
   geom_density(lwd = 1, fill = "chartreuse3", col = "chartreuse3", alpha = .25) +
   labs(title = "DVI distribution", x = "Value", y = "Density")
+
+     #mh not so nice
   
   
