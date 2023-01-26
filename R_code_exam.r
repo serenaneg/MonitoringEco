@@ -21,13 +21,13 @@ file <- stack(blue, green, red, nir, swir)
 
 #cut the image to zoom on the region of interest
 #extention of the original image: 283185, 430005, 4514385, 4732515  
-boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
+boundary <- raster( xmn = 369000, xmx = 430000 , ymn = 4609900, ymx = 4680000)
 image <- crop(file, boundary)
 
 #plot true color image and save
-pdf("rgbTrue.pdf")
+pdf("rgbTrue.pdf", 7, 8)
 par(mfrow=c(2,2))
-plotRGB(image, r = 3, g = 2, b = 1, stretch = "lin", main = "Linear stretching")
+plotRGB(image, r = 3, g = 2, b = 1, stretch = "lin")
 dev.off()
 
 #ok with linear stretching because it has a strong contrast very useful to visualise algae
@@ -35,7 +35,7 @@ dev.off()
 #infrared image
 #create the image with nir band (5) as red, red band (4) green and green band (3) as blue 
 rgb_lw <- stack(red, nir, swir)
-boundary <- raster( xmn = 365000, xmx = 430000 , ymn = 4600000, ymx = 4680000)
+boundary <- raster( xmn = 369000, xmx = 430000 , ymn = 4609900, ymx = 4680000)
 image_lw <- crop(rgb_lw, boundary)
 
 #plot layers red bands
