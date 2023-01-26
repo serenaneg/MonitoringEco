@@ -4,7 +4,6 @@ library(RStoolbox)
 library(raster)
 library(RColorBrewer)
 library(ggplot2)
-library(reshape2) #to create the data frame for ggplot graphs
 library(patchwork)
 
 #upload the data into R
