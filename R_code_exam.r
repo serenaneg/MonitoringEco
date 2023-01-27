@@ -136,7 +136,7 @@ index <- stack(dvi, ndvi, sabi, fai)
 dat <- as.data.frame(index)
 
 #remove NAN values
-dat <- na.omit(na)
+dat <- na.omit(NA)
 
 #Histograms
 p1 <- ggplot(dat, aes(x = layer.1)) + 
@@ -162,16 +162,43 @@ d3 <- ggplot(dat, aes(x = layer.3)) +
 d4 <- ggplot(dat, aes(x = layer.4)) + 
      geom_density(color = "coral", fill = "coral", alpha = .25) + labs(title = "FAI density", x = "Value", y = "Density")
 
+
 pdf("density.pdf", 11, 8)
 (d1 + d2) / (d3 + d4)
 dev.off()
 
-#overlay density on histrograms
-ggplot(dat, aes(x = layer.1)) +
-  geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
-  geom_density(lwd = 1, fill = "chartreuse3", col = "chartreuse3", alpha = .25) +
-  labs(title = "DVI distribution", x = "Value", y = "Density")
+#Clorophyll indev
+#CI = NIR/Green - 1
+ci <- image_masked[[4]] / image_masked[[2]] - 1
 
-     #mh not so nice
-  
-  
+pdf("ci.pdf")
+plot(ci, main = "CI", col = colors)
+dev.off()
+
+#comparison supposig ci is the refernce
+ref <- stack(ci, sabi, fai)
+dat2 <- as.data.frame(ref)
+
+dat2 <- na.omit(NA)
+
+#overlay density on histrograms
+c1 <- ggplot(dat2, aes(x = layer.1)) +
+  geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
+  geom_density(lwd = 1, fill = "aquamarine3", col = "aquamarine3", alpha = .25) +
+  labs(title = "CI distribution", x = "Value", y = "Density")
+
+c2 <- ggplot(dat2, aes(x = layer.2)) +
+  geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
+  geom_density(lwd = 1, fill = "blue", col = "blue", alpha = .25) +
+  labs(title = "SABI distribution", x = "Value", y = "Density")
+
+c3 <- ggplot(dat2, aes(x = layer.3)) +
+  geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
+  geom_density(lwd = 1, fill = "coral", col = "coral", alpha = .25) +
+  labs(title = "FAI distribution", x = "Value", y = "Density")
+
+pdf("his_des.pdf", 15, 5)
+c1 + c2 + c3
+dev.off()
+
+#no comparison of the densities in the same graph because fai is two orders of magnitude bigger than the other by definition
