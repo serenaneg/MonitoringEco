@@ -1,7 +1,7 @@
 #load useful library
 library(rgdal)
 library(RStoolbox)
-library(raster)
+library(rasterdiv)
 library(RColorBrewer)
 library(ggplot2)
 library(patchwork)
@@ -135,18 +135,18 @@ dev.off()
 index <- stack(dvi, ndvi, sabi, fai)
 dat <- as.data.frame(index)
 
-#remove NAN values
-dat <- na.omit(NA)
+dat <- na.omit(dat)
 
 #Histograms
 p1 <- ggplot(dat, aes(x = layer.1)) + 
-     geom_histogram(color = "black", fill = "chartreuse3", alpha = .4, lwd = 0.5) + labs(title = "DVI distribution", x = "Value", y = "Frequency")
+     geom_histogram(color = "black", fill = "chartreuse3", alpha = 0.4, lwd = 0.5) + labs(title = "DVI distribution", x = "Value", y = "Frequency")
 p2 <- ggplot(dat, aes(x = layer.2)) + 
-     geom_histogram(color = "black", fill = "orange", alpha = .4, lwd = 0.5) + labs(title = "NDVI distribution", x = "Value", y = "Frequency")
+     geom_histogram(color = "black", fill = "orange", alpha = 0.4, lwd = 0.5) + labs(title = "NDVI distribution", x = "Value", y = "Frequency") 
 p3 <- ggplot(dat, aes(x = layer.3)) + 
-     geom_histogram(color = "black", fill = "blue", alpha = .4, lwd = 0.5) + labs(title = "SABI distribution", x = "Value", y = "Frequency")
+     geom_histogram(color = "black", fill = "blue", alpha = 0.4, lwd = 0.5) + labs(title = "SABI distribution", x = "Value", y = "Frequency") 
 p4 <- ggplot(dat, aes(x = layer.4)) + 
-     geom_histogram(color = "black", fill = "coral", alpha = .4, lwd = 0.5) + labs(title = "FAI distribution", x = "Value", y = "Frequency")
+     geom_histogram(color = "black", fill = "coral", alpha = 0.4, lwd = 0.5) + labs(title = "FAI distribution", x = "Value", y = "Frequency")
+ 
 
 pdf("hist_gg.pdf", 11, 8)
 (p1 + p2) / (p3 + p4)
@@ -154,13 +154,13 @@ dev.off()
 
 #density distributions
 d1 <- ggplot(dat, aes(x = layer.1)) + 
-     geom_density(color = "chartreuse3", fill = "chartreuse3", alpha = .25) + labs(title = "DVI density", x = "Value", y = "Density")
+     geom_density(color = "chartreuse3", fill = "chartreuse3", alpha = 0.25) + labs(title = "DVI density", x = "Value", y = "Density")
 d2 <- ggplot(dat, aes(x = layer.2)) + 
-     geom_density(color = "orange",  fill = "orange", alpha = .25) + labs(title = "NDVI density", x = "Value", y = "Density")
+     geom_density(color = "orange",  fill = "orange", alpha = 0.25) + labs(title = "NDVI density", x = "Value", y = "Density")
 d3 <- ggplot(dat, aes(x = layer.3)) + 
-     geom_density(color = "blue", fill = "blue", alpha = .25) + labs(title = "SABI density", x = "Value", y = "Density")
+     geom_density(color = "blue", fill = "blue", alpha = 0.25) + labs(title = "SABI density", x = "Value", y = "Density")
 d4 <- ggplot(dat, aes(x = layer.4)) + 
-     geom_density(color = "coral", fill = "coral", alpha = .25) + labs(title = "FAI density", x = "Value", y = "Density")
+     geom_density(color = "coral", fill = "coral", alpha = 0.25) + labs(title = "FAI density", x = "Value", y = "Density")
 
 
 pdf("density.pdf", 11, 8)
@@ -179,22 +179,22 @@ dev.off()
 ref <- stack(ci, sabi, fai)
 dat2 <- as.data.frame(ref)
 
-dat2 <- na.omit(NA)
+dat2 <- na.omit(dat2)
 
 #overlay density on histrograms
 c1 <- ggplot(dat2, aes(x = layer.1)) +
   geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
-  geom_density(lwd = 1, fill = "aquamarine3", col = "aquamarine3", alpha = .25) +
+  geom_density(lwd = 1, fill = "aquamarine3", col = "aquamarine3", alpha = 0.25) +
   labs(title = "CI distribution", x = "Value", y = "Density")
 
 c2 <- ggplot(dat2, aes(x = layer.2)) +
   geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
-  geom_density(lwd = 1, fill = "blue", col = "blue", alpha = .25) +
+  geom_density(lwd = 1, fill = "blue", col = "blue", alpha = 0.25) +
   labs(title = "SABI distribution", x = "Value", y = "Density")
 
 c3 <- ggplot(dat2, aes(x = layer.3)) +
   geom_histogram(aes(y = ..density..), color = "black", fill = "white", lwd = 0.5) + 
-  geom_density(lwd = 1, fill = "coral", col = "coral", alpha = .25) +
+  geom_density(lwd = 1, fill = "coral", col = "coral", alpha = 0.25) +
   labs(title = "FAI distribution", x = "Value", y = "Density")
 
 pdf("his_des.pdf", 15, 5)
