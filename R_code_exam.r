@@ -185,7 +185,7 @@ ci_pos <- ci
 #select only some values
 sabi_pos[sabi_pos < 0] <- NA
 fai_pos[fai_pos < 0] <- NA
-ci_pos[ci_pos < -0.5] <- NA
+ci_pos[ci_pos < -0.3] <- NA
 
 pdf("positive.pdf", 18, 7)
 par(mfrow = c(1,3), mar = c(3.5, 3.5, 3.5, 7))
