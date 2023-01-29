@@ -175,7 +175,26 @@ pdf("ci.pdf")
 plot(ci, main = "CI", col = colors)
 dev.off()
 
-#comparison supposig ci is the refernce
+#clorophyll estimation looking at only positive values for sabi and fai 
+#NIR is the gratest emission
+#copy raster's indices
+sabi_pos <- sabi
+fai_pos <- fai
+ci_pos <- ci
+
+#select only some values
+sabi_pos[sabi_pos < 0] <- NA
+fai_pos[fai_pos < 0] <- NA
+ci_pos[ci_pos < -0.5] <- NA
+
+pdf("positive.pdf", 18, 7)
+par(mfrow = c(1,3), mar = c(3.5, 3.5, 3.5, 7))
+plot(sabi_pos, col = "blue3", main = "SABI positive", cex.main = 2)
+plot(fai_pos, col = "blue3", main = "FAI positive", cex.main = 2)
+plot(ci_pos, col = "blue3", main = "CI positive", cex.main = 2)
+dev.off()
+
+#comparison through histograms
 ref <- stack(ci, sabi, fai)
 dat2 <- as.data.frame(ref)
 
