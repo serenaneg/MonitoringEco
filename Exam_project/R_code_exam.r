@@ -185,13 +185,13 @@ ci_pos <- ci
 #select only some values
 sabi_pos[sabi_pos < 0] <- NA
 fai_pos[fai_pos < 0] <- NA
-ci_pos[ci_pos < -0.3] <- NA
+ci_pos[ci_pos < -0.4] <- NA
 
 pdf("positive.pdf", 18, 7)
 par(mfrow = c(1,3), mar = c(3.5, 3.5, 3.5, 7))
+plot(ci_pos, col = "blue3", main = "CI > 0.4", cex.main = 2)
 plot(sabi_pos, col = "blue3", main = "SABI positive", cex.main = 2)
 plot(fai_pos, col = "blue3", main = "FAI positive", cex.main = 2)
-plot(ci_pos, col = "blue3", main = "CI positive", cex.main = 2)
 dev.off()
 
 #comparison through histograms
