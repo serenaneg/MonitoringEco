@@ -288,10 +288,10 @@ sabi_pos <- sabi
 fai_pos <- fai
 ci_pos <- ci
 
-#select only positive value for SABI and FAI and CI > -0.5
+#select only positive value for SABI and FAI and CI > -0.4
 sabi_pos[sabi_pos < 0] <- NA
 fai_pos[fai_pos < 0] <- NA
-ci_pos[ci_pos < -0.5] <- NA
+ci_pos[ci_pos < -0.4] <- NA
 \end{lstlisting}
 \begin{figure}
     \centering
